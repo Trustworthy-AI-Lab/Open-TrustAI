@@ -7,12 +7,11 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Any
 
-from open_trustai.datasets.tabular import (
-    AdultDataset,
-    GermanCreditDataset,
-    CompasDataset,
-    BankMarketingDataset,
-)
+from open_trustai.datasets.base import FairDataset, TabularDataset, VisionDataset
+from open_trustai.datasets.adult import AdultDataset
+from open_trustai.datasets.germancredit import GermanCreditDataset
+from open_trustai.datasets.compas import CompasDataset
+from open_trustai.datasets.bankmarketing import BankMarketingDataset
 
 
 class TestAdultDataset:
