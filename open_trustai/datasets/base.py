@@ -11,6 +11,14 @@ from torch.utils.data import Dataset
 from torchvision.transforms import Compose
 from PIL import Image
 
+# Add import error handling at the top with other imports
+try:
+    from torchvision import transforms
+
+    _HAS_VISION_DEPS = True
+except ImportError:
+    _HAS_VISION_DEPS = False
+
 
 class FairDataset(Dataset, ABC):
     """Base class for all fairness-aware datasets.
@@ -238,6 +246,11 @@ class TabularDataset(FairDataset):
         self.categorical_encoding = categorical_encoding
         self.numerical_scaling = numerical_scaling
 
+        # Initialize these attributes that will be set in _load_data
+        self.features = None
+        self.target = None
+        self.sensitive = None
+
         super().__init__(
             root=root,
             download=download,
@@ -372,10 +385,21 @@ class VisionDataset(FairDataset):
             image_size: Size to resize images to (height, width)
             cache_images: Whether to cache images in memory for faster access
         """
+        if not _HAS_VISION_DEPS:
+            raise ImportError(
+                "Vision dependencies not found. Please install them with:\n"
+                "pip install torch torchvision Pillow"
+            )
+
         self.image_size = image_size
         self.cache_images = cache_images
         self._image_cache = {}
-        self.data = None  # Will store image paths and metadata
+        self.df = None  # Will store image paths and metadata
+
+        # Initialize these attributes that will be set in _load_data
+        self.target = None
+        self.sensitive = None
+        self.df = None
 
         if feature_transform is None:
             feature_transform = self._get_default_transforms()
@@ -388,4 +412,16 @@ class VisionDataset(FairDataset):
             feature_transform=feature_transform,
             target_transform=target_transform,
             sensitive_transform=sensitive_transform,
+        )
+
+    def _get_default_transforms(self) -> Compose:
+        """Get default image transforms."""
+        return Compose(
+            [
+                transforms.Resize(self.image_size),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                ),
+            ]
         )
