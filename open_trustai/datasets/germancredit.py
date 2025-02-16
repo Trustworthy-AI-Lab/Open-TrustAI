@@ -206,23 +206,23 @@ class GermanCreditDataset(TabularDataset):
         file_path = os.path.join(self.root, self.base_folder, "german.data")
 
         # Load data
-        self.data = pd.read_csv(file_path, sep=" ", header=None)
+        self.df = pd.read_csv(file_path, sep=" ", header=None)
 
         # Assign column names
-        self.data.columns = self.feature_names + ["credit_risk"]
+        self.df.columns = self.feature_names + ["credit_risk"]
 
         # Extract sensitive attributes
-        self.data["sex"] = self.data["personal_status_sex"].map(
+        self.df["sex"] = self.df["personal_status_sex"].map(
             lambda x: 1 if x in [2, 3, 4] else 0  # Female = 1, Male = 0
         )
 
         # Convert target to binary (1 = good, 0 = bad)
-        self.data["credit_risk"] = self.data["credit_risk"].map(
+        self.df["credit_risk"] = self.df["credit_risk"].map(
             lambda x: 1 if x == 1 else 0
         )
 
         # Preprocess features
-        features = self.data[self.feature_names].copy()
+        features = self.df[self.feature_names].copy()
         features = self._preprocess_categorical(features)
         features = self._preprocess_numerical(features)
 
@@ -231,12 +231,12 @@ class GermanCreditDataset(TabularDataset):
             features.values.astype(np.float32), dtype=torch.float32
         )
         self.target = torch.tensor(
-            self.data[self.target_attribute].values.astype(np.float32),
+            self.df[self.target_attribute].values.astype(np.float32),
             dtype=torch.float32,
         )
 
         # Extract and encode sensitive attribute
-        sensitive_data = self.data[self.sensitive_attribute].copy()
+        sensitive_data = self.df[self.sensitive_attribute].copy()
         if self.sensitive_attribute in self.categorical_features:
             # For categorical sensitive attributes, encode them first
             sensitive_data = pd.get_dummies(sensitive_data).iloc[:, 0]

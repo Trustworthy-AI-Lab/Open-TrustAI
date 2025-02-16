@@ -200,33 +200,33 @@ class CompasDataset(TabularDataset):
         )
 
         # Load data
-        self.data = pd.read_csv(file_path)
+        self.df = pd.read_csv(file_path)
 
         # Filter the data according to ProPublica's analysis
-        self.data = self.data[
-            (self.data.days_b_screening_arrest <= 30)
-            & (self.data.days_b_screening_arrest >= -30)
-            & (self.data.is_recid != -1)
-            & (self.data.c_charge_degree != "O")
-            & (self.data.score_text != "N/A")
+        self.df = self.df[
+            (self.df.days_b_screening_arrest <= 30)
+            & (self.df.days_b_screening_arrest >= -30)
+            & (self.df.is_recid != -1)
+            & (self.df.c_charge_degree != "O")
+            & (self.df.score_text != "N/A")
         ]
 
         # Ensure all categorical features are strings
         for cat_feature in self.categorical_features:
-            self.data[cat_feature] = self.data[cat_feature].astype(str)
+            self.df[cat_feature] = self.df[cat_feature].astype(str)
 
         # Handle missing values
         for num_feature in self.numerical_features:
-            self.data[num_feature] = self.data[num_feature].fillna(
-                self.data[num_feature].mean()
+            self.df[num_feature] = self.df[num_feature].fillna(
+                self.df[num_feature].mean()
             )
         for cat_feature in self.categorical_features:
-            self.data[cat_feature] = self.data[cat_feature].fillna(
-                self.data[cat_feature].mode()[0]
+            self.df[cat_feature] = self.df[cat_feature].fillna(
+                self.df[cat_feature].mode()[0]
             )
 
         # Preprocess features
-        features = self.data[self.feature_names].copy()
+        features = self.df[self.feature_names].copy()
         features = self._preprocess_categorical(features)
         features = self._preprocess_numerical(features)
 
@@ -235,12 +235,12 @@ class CompasDataset(TabularDataset):
             features.values.astype(np.float32), dtype=torch.float32
         )
         self.target = torch.tensor(
-            self.data["is_recid"].values.astype(np.float32),
+            self.df["is_recid"].values.astype(np.float32),
             dtype=torch.float32,
         )
 
         # Extract and encode sensitive attribute
-        sensitive_data = self.data[self.sensitive_attribute].copy()
+        sensitive_data = self.df[self.sensitive_attribute].copy()
         if self.sensitive_attribute in self.categorical_features:
             # For categorical sensitive attributes, encode them first
             sensitive_data = pd.get_dummies(sensitive_data).iloc[:, 0]

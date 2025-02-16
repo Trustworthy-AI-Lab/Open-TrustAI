@@ -209,34 +209,34 @@ class AdultDataset(TabularDataset):
         # The test set has a different format with dots at the end of each line
         if self.split == "test":
             # Load test data and remove trailing periods
-            self.data = pd.read_csv(
+            self.df = pd.read_csv(
                 file_path,
                 names=columns,
                 skipinitialspace=True,
                 na_values=["?"],
                 skiprows=1,
             )
-            self.data = self.data.apply(
+            self.df = self.df.apply(
                 lambda x: x.str.rstrip(".") if x.dtype == "object" else x
             )
         else:
-            self.data = pd.read_csv(
+            self.df = pd.read_csv(
                 file_path, names=columns, skipinitialspace=True, na_values=["?"]
             )
 
         # Clean income labels
-        self.data["income"] = self.data["income"].map(
+        self.df["income"] = self.df["income"].map(
             lambda x: 1 if x.strip().startswith(">50K") else 0
         )
 
         # Handle missing values
         for col in self.categorical_features:
-            self.data[col].fillna(self.data[col].mode()[0], inplace=True)
+            self.df[col].fillna(self.df[col].mode()[0], inplace=True)
         for col in self.numerical_features:
-            self.data[col].fillna(self.data[col].mean(), inplace=True)
+            self.df[col].fillna(self.df[col].mean(), inplace=True)
 
         # Preprocess features
-        features = self.data[self.feature_names].copy()
+        features = self.df[self.feature_names].copy()
         features = self._preprocess_categorical(features)
         features = self._preprocess_numerical(features)
 
@@ -245,12 +245,12 @@ class AdultDataset(TabularDataset):
             features.values.astype(np.float32), dtype=torch.float32
         )
         self.target = torch.tensor(
-            self.data[self.target_attribute].values.astype(np.float32),
+            self.df[self.target_attribute].values.astype(np.float32),
             dtype=torch.float32,
         )
 
         # Extract and encode sensitive attribute
-        sensitive_data = self.data[self.sensitive_attribute].copy()
+        sensitive_data = self.df[self.sensitive_attribute].copy()
         if self.sensitive_attribute in self.categorical_features:
             # For categorical sensitive attributes, encode them first
             sensitive_data = pd.get_dummies(sensitive_data).iloc[:, 0]
