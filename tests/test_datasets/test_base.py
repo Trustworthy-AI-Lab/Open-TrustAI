@@ -26,7 +26,7 @@ class DummyFairDataset(FairDataset):
         )
         # Set seed for reproducible data
         torch.manual_seed(42)
-        self.data = torch.randn(100, 10)  # 100 samples, 10 features
+        self.df = torch.randn(100, 10)  # 100 samples, 10 features
         self.targets = torch.randint(0, 2, (100,))  # Binary targets
         self.sensitive = torch.randint(0, 2, (100, 2))  # Two sensitive attributes
 
@@ -68,10 +68,10 @@ class DummyFairDataset(FairDataset):
         return "Test bias notes"
 
     def __len__(self) -> int:
-        return len(self.data)
+        return len(self.df)
 
     def __getitem__(self, idx: int):
-        data = self.data[idx]
+        data = self.df[idx]
         target = self.targets[idx]
         sensitive = self.sensitive[idx]
 
@@ -106,7 +106,7 @@ class DummyTabularDataset(TabularDataset):
         )
         # Set seed for reproducible data
         torch.manual_seed(42)
-        self.data = torch.randn(100, 10)
+        self.df = torch.randn(100, 10)
         self.targets = torch.randint(0, 2, (100,))
         self.sensitive = torch.randint(0, 2, (100, 2))
 
@@ -156,10 +156,10 @@ class DummyTabularDataset(TabularDataset):
         pass
 
     def __len__(self) -> int:
-        return len(self.data)
+        return len(self.df)
 
     def __getitem__(self, idx: int):
-        data = self.data[idx]
+        data = self.df[idx]
         target = self.targets[idx]
         sensitive = self.sensitive[idx]
 
