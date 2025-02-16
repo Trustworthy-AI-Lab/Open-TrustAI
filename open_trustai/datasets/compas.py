@@ -239,14 +239,20 @@ class CompasDataset(TabularDataset):
             dtype=torch.float32,
         )
 
-        # Extract and encode sensitive attribute
+        # Extract sensitive attribute
         sensitive_data = self.df[self.sensitive_attribute].copy()
-        if self.sensitive_attribute in self.categorical_features:
-            # For categorical sensitive attributes, encode them first
-            sensitive_data = pd.get_dummies(sensitive_data).iloc[:, 0]
+        if self.sensitive_attribute == "race":
+            # Binarize race: 1 if Caucasian, 0 otherwise
+            sensitive_data = (sensitive_data == "Caucasian").astype(int)
+        elif self.sensitive_attribute == "sex":
+            # Binarize sex: 1 if Female, 0 if Male
+            sensitive_data = (sensitive_data == "Female").astype(int)
+        elif self.sensitive_attribute == "age_cat":
+            # Binarize age: 1 if Greater than 45, 0 otherwise
+            sensitive_data = (sensitive_data == "Greater than 45").astype(int)
 
         # Extract sensitive attribute and reshape to column vector
         self.sensitive = torch.tensor(
-            sensitive_data.values.reshape(-1, 1).astype(np.float32),
+            sensitive_data.values.astype(np.float32),
             dtype=torch.float32,
-        )
+        ).reshape(-1, 1)

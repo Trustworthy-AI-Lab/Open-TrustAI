@@ -211,25 +211,6 @@ class GermanCreditDataset(TabularDataset):
         # Assign column names
         self.df.columns = self.feature_names + ["credit_risk"]
 
-        # Extract sensitive attributes
-        if self.sensitive_attribute == "sex":
-            self.df["sex"] = self.df["personal_status_sex"].map(
-                lambda x: 1 if x in ["A92", "A95"] else 0  # Female = 1, Male = 0
-            )
-        if self.sensitive_attribute == "age":
-            self.df["age"] = self.df["age"].map(
-                lambda x: 1 if x >= 25 else 0  # Age >= 25 = 1, Age < 25 = 0
-            )
-        if self.sensitive_attribute == "foreign_worker":
-            self.df["foreign_worker"] = self.df["foreign_worker"].map(
-                lambda x: 1 if x == "A201" else 0  # Foreign worker = 1, Not foreign = 0
-            )
-
-        # Convert target to binary (1 = good, 0 = bad)
-        self.df["credit_risk"] = self.df["credit_risk"].map(
-            lambda x: 1 if x == 1 else 0
-        )
-
         # Preprocess features
         features = self.df[self.feature_names].copy()
         features = self._preprocess_categorical(features)
@@ -246,12 +227,21 @@ class GermanCreditDataset(TabularDataset):
 
         # Extract and encode sensitive attribute
         sensitive_data = self.df[self.sensitive_attribute].copy()
-        if self.sensitive_attribute in self.categorical_features:
-            # For categorical sensitive attributes, encode them first
-            sensitive_data = pd.get_dummies(sensitive_data).iloc[:, 0]
+        if self.sensitive_attribute == "age":
+            # Binarize age: 1 if age >= 25, 0 otherwise
+            sensitive_data = (sensitive_data >= 25).astype(int)
+        elif self.sensitive_attribute == "sex":
+            # Binarize sex: 1 if Female, 0 if Male
+            sensitive_data = (sensitive_data == "Female").astype(int)
+        elif self.sensitive_attribute == "marital":
+            # Binarize marital status: 1 if married, 0 otherwise
+            sensitive_data = (sensitive_data == "married").astype(int)
+        elif self.sensitive_attribute == "education":
+            # Binarize education: 1 if has higher education, 0 otherwise
+            sensitive_data = (sensitive_data.isin(["high", "university"])).astype(int)
 
         # Extract sensitive attribute and reshape to column vector
         self.sensitive = torch.tensor(
-            sensitive_data.values.reshape(-1, 1).astype(np.float32),
+            sensitive_data.values.astype(np.float32),
             dtype=torch.float32,
-        )
+        ).reshape(-1, 1)

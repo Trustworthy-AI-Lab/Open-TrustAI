@@ -226,13 +226,6 @@ class BankMarketingDataset(TabularDataset):
         # Convert target to binary
         self.df["y"] = (self.df["y"] == "yes").astype(int)
 
-        # Create age categories
-        self.df["age_cat"] = pd.cut(
-            self.df["age"],
-            bins=[0, 25, 45, 60, float("inf")],
-            labels=["<25", "25-45", "45-60", ">60"],
-        )
-
         # Preprocess features
         features = self.df[self.feature_names].copy()
         features = self._preprocess_categorical(features)
@@ -247,14 +240,20 @@ class BankMarketingDataset(TabularDataset):
             dtype=torch.float32,
         )
 
-        # Extract and encode sensitive attribute
+        # Extract sensitive attribute
         sensitive_data = self.df[self.sensitive_attribute].copy()
-        if self.sensitive_attribute in self.categorical_features:
-            # For categorical sensitive attributes, encode them first
-            sensitive_data = pd.get_dummies(sensitive_data).iloc[:, 0]
+        if self.sensitive_attribute == "age":
+            # Binarize age: 1 if age >= 40, 0 otherwise
+            sensitive_data = (sensitive_data >= 40).astype(int)
+        elif self.sensitive_attribute == "marital":
+            # Binarize marital: 1 if married, 0 otherwise
+            sensitive_data = (sensitive_data == "married").astype(int)
+        elif self.sensitive_attribute == "education":
+            # Binarize education: 1 if university degree, 0 otherwise
+            sensitive_data = (sensitive_data == "university.degree").astype(int)
 
-        # Extract sensitive attribute and reshape to column vector
+        # Convert to tensor and reshape to column vector
         self.sensitive = torch.tensor(
-            sensitive_data.values.reshape(-1, 1).astype(np.float32),
+            sensitive_data.values.astype(np.float32),
             dtype=torch.float32,
-        )
+        ).reshape(-1, 1)
