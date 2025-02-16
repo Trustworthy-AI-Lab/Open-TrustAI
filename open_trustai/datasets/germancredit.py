@@ -212,9 +212,18 @@ class GermanCreditDataset(TabularDataset):
         self.df.columns = self.feature_names + ["credit_risk"]
 
         # Extract sensitive attributes
-        self.df["sex"] = self.df["personal_status_sex"].map(
-            lambda x: 1 if x in [2, 3, 4] else 0  # Female = 1, Male = 0
-        )
+        if self.sensitive_attribute == "sex":
+            self.df["sex"] = self.df["personal_status_sex"].map(
+                lambda x: 1 if x in ["A92", "A95"] else 0  # Female = 1, Male = 0
+            )
+        if self.sensitive_attribute == "age":
+            self.df["age"] = self.df["age"].map(
+                lambda x: 1 if x >= 25 else 0  # Age >= 25 = 1, Age < 25 = 0
+            )
+        if self.sensitive_attribute == "foreign_worker":
+            self.df["foreign_worker"] = self.df["foreign_worker"].map(
+                lambda x: 1 if x == "A201" else 0  # Foreign worker = 1, Not foreign = 0
+            )
 
         # Convert target to binary (1 = good, 0 = bad)
         self.df["credit_risk"] = self.df["credit_risk"].map(
