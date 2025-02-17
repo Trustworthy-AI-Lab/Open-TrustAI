@@ -17,7 +17,7 @@ class GermanCreditDataset(TabularDataset):
 
     The German Credit dataset contains credit data from a German bank.
     The task is to predict whether a customer has good or bad credit risk.
-    Sensitive attributes include 'age', 'sex', and 'foreign_worker'.
+    Sensitive attributes include 'age', 'personal_status_sex', and 'foreign_worker'.
 
     Reference:
     Dua, D. and Graff, C. (2019). UCI Machine Learning Repository.
@@ -43,7 +43,7 @@ class GermanCreditDataset(TabularDataset):
         root: str,
         download: bool = True,
         target_attribute: str = "credit_risk",
-        sensitive_attribute: str = "sex",
+        sensitive_attribute: str = "personal_status_sex",
         feature_transform: Optional[Any] = None,
         target_transform: Optional[Any] = None,
         sensitive_transform: Optional[Any] = None,
@@ -56,7 +56,7 @@ class GermanCreditDataset(TabularDataset):
             root: Root directory for the dataset
             download: Whether to download the dataset if not present
             target_attribute: Target attribute to use (defaults to 'credit_risk')
-            sensitive_attribute: Sensitive attribute to use (defaults to 'sex')
+            sensitive_attribute: Sensitive attribute to use (defaults to 'personal_status_sex')
             feature_transform: Transform to apply to features
             target_transform: Transform to apply to targets
             sensitive_transform: Transform to apply to sensitive attributes
@@ -139,7 +139,7 @@ class GermanCreditDataset(TabularDataset):
     @property
     def sensitive_attribute_names(self) -> List[str]:
         """List of sensitive attribute names."""
-        return ["age", "sex", "foreign_worker"]
+        return ["age", "personal_status_sex", "foreign_worker"]
 
     @property
     def target_attribute_names(self) -> List[str]:
@@ -151,7 +151,7 @@ class GermanCreditDataset(TabularDataset):
         """Get protected group values for each sensitive attribute."""
         return {
             "age": [">=25"],  # Age is often binarized at 25
-            "sex": ["Female"],
+            "personal_status_sex": ["Female"],
             "foreign_worker": ["Yes"],
         }
 
@@ -230,8 +230,8 @@ class GermanCreditDataset(TabularDataset):
         if self.sensitive_attribute == "age":
             # Binarize age: 1 if age >= 25, 0 otherwise
             sensitive_data = (sensitive_data >= 25).astype(int)
-        elif self.sensitive_attribute == "sex":
-            # Binarize sex: 1 if Female, 0 if Male
+        elif self.sensitive_attribute == "personal_status_sex":
+            # Binarize personal_status_sex: 1 if Female, 0 if Male
             sensitive_data = (sensitive_data == "Female").astype(int)
         elif self.sensitive_attribute == "marital":
             # Binarize marital status: 1 if married, 0 otherwise

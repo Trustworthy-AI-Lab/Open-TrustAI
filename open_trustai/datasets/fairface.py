@@ -268,5 +268,18 @@ class FairFaceDataset(VisionDataset):
             self.df[attr] = self.df[attr].map(mapping)
 
         # Extract target and sensitive attributes
+        # Binarize sensitive attributes based on selection
+        sensitive_data = self.df[self.sensitive_attribute].copy()
+        if self.sensitive_attribute == "gender":
+            # Binarize gender: 1 if female, 0 if male
+            sensitive_data = (sensitive_data == 1).astype(int)
+        elif self.sensitive_attribute == "race":
+            # Binarize race: 1 if white, 0 otherwise
+            sensitive_data = (sensitive_data == 0).astype(int)
+        elif self.sensitive_attribute == "age":
+            # Binarize age: 1 if age >= 30 (groups 30-39 and above), 0 otherwise
+            sensitive_data = (sensitive_data >= 4).astype(int)
+
+        self.df[self.sensitive_attribute] = sensitive_data
         self.target = torch.tensor(self.df[self.target_attribute].values)
         self.sensitive = torch.tensor(self.df[self.sensitive_attribute].values)
