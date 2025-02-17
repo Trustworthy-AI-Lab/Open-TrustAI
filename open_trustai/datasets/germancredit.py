@@ -220,8 +220,9 @@ class GermanCreditDataset(TabularDataset):
         self.features = torch.tensor(
             features.values.astype(np.float32), dtype=torch.float32
         )
+        # normalize target from 1, 2 to 0, 1
         self.target = torch.tensor(
-            self.df[self.target_attribute].values.astype(np.float32),
+            (self.df[self.target_attribute].values - 1).astype(np.float32),
             dtype=torch.float32,
         )
 
