@@ -127,7 +127,7 @@ class TestGermanCreditDataset:
         )
         assert len(dataset.feature_names) == 20
         assert "age" in dataset.sensitive_attribute_names
-        assert "sex" in dataset.sensitive_attribute_names
+        assert "personal_status_sex" in dataset.sensitive_attribute_names
         assert "foreign_worker" in dataset.sensitive_attribute_names
 
     def test_german_credit_dataset_loading(self, tmp_path):
@@ -154,11 +154,11 @@ class TestGermanCreditDataset:
         info = dataset.get_fairness_info()
 
         assert "age" in info["sensitive_attributes"]
-        assert "sex" in info["sensitive_attributes"]
+        assert "personal_status_sex" in info["sensitive_attributes"]
         assert "foreign_worker" in info["sensitive_attributes"]
 
         assert ">=25" in info["protected_groups"]["age"]
-        assert "Female" in info["protected_groups"]["sex"]
+        assert "Female" in info["protected_groups"]["personal_status_sex"]
         assert "Yes" in info["protected_groups"]["foreign_worker"]
 
 
@@ -170,7 +170,7 @@ class TestCompasDataset:
         )
         assert len(dataset.feature_names) == 15
         assert "race" in dataset.sensitive_attribute_names
-        assert "sex" in dataset.sensitive_attribute_names
+        assert "personal_status_sex" in dataset.sensitive_attribute_names
         assert "age_cat" in dataset.sensitive_attribute_names
 
     def test_compas_dataset_loading(self, tmp_path):
@@ -199,11 +199,11 @@ class TestCompasDataset:
         info = dataset.get_fairness_info()
 
         assert "race" in info["sensitive_attributes"]
-        assert "sex" in info["sensitive_attributes"]
+        assert "personal_status_sex" in info["sensitive_attributes"]
         assert "age_cat" in info["sensitive_attributes"]
 
         assert "African-American" in info["protected_groups"]["race"]
-        assert "Female" in info["protected_groups"]["sex"]
+        assert "Female" in info["protected_groups"]["personal_status_sex"]
         assert any("45" in age for age in info["protected_groups"]["age_cat"])
 
 
