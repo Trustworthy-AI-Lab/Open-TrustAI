@@ -252,17 +252,17 @@ class AdultDataset(TabularDataset):
         # Extract and encode sensitive attribute
         sensitive_data = self.df[self.sensitive_attribute].copy()
         if self.sensitive_attribute == "sex":
-            # Binarize sex: 1 if Female, 0 if Male
-            sensitive_data = (sensitive_data == "Female").astype(int)
+            # Binarize sex: 0 if Female, 1 if Male
+            sensitive_data = (sensitive_data == "Male").astype(int)
         elif self.sensitive_attribute == "race":
             # Binarize race: 1 if White, 0 otherwise
             sensitive_data = (sensitive_data == "White").astype(int)
         elif self.sensitive_attribute == "age":
-            # Binarize age: 1 if age >= 40, 0 otherwise
-            sensitive_data = (sensitive_data >= 40).astype(int)
+            # Binarize age: 0 if age >= 40, 1 otherwise
+            sensitive_data = (sensitive_data < 40).astype(int)
         elif self.sensitive_attribute == "marital-status":
-            # Binarize marital status: 1 if married, 0 otherwise
-            sensitive_data = (sensitive_data == "Married-civ-spouse").astype(int)
+            # Binarize marital status: 0 if married, 1 otherwise
+            sensitive_data = (sensitive_data != "Married-civ-spouse").astype(int)
         elif self.sensitive_attribute == "education":
             # Binarize education: 1 if has college degree, 0 otherwise
             sensitive_data = (

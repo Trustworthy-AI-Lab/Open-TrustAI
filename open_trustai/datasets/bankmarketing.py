@@ -243,11 +243,11 @@ class BankMarketingDataset(TabularDataset):
         # Extract sensitive attribute
         sensitive_data = self.df[self.sensitive_attribute].copy()
         if self.sensitive_attribute == "age":
-            # Binarize age: 1 if age >= 40, 0 otherwise
-            sensitive_data = (sensitive_data >= 40).astype(int)
+            # Binarize age: 0 if age >= 40, 1 otherwise
+            sensitive_data = (sensitive_data < 40).astype(int)
         elif self.sensitive_attribute == "marital":
-            # Binarize marital: 1 if married, 0 otherwise
-            sensitive_data = (sensitive_data == "married").astype(int)
+            # Binarize marital: 0 if married, 1 otherwise
+            sensitive_data = (sensitive_data != "married").astype(int)
         elif self.sensitive_attribute == "education":
             # Binarize education: 1 if university degree, 0 otherwise
             sensitive_data = (sensitive_data == "university.degree").astype(int)

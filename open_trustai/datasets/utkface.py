@@ -279,14 +279,14 @@ class UTKFaceDataset(VisionDataset):
         # Binarize sensitive attributes based on selection
         sensitive_data = self.df[self.sensitive_attribute].copy()
         if self.sensitive_attribute == "gender":
-            # Binarize gender: 1 if female, 0 if male
-            sensitive_data = (sensitive_data == 1).astype(int)
+            # Binarize gender: 0 if female, 1 if male
+            sensitive_data = (sensitive_data != 1).astype(int)
         elif self.sensitive_attribute == "race":
             # Binarize race: 1 if white, 0 otherwise
             sensitive_data = (sensitive_data == 0).astype(int)
         elif self.sensitive_attribute == "age":
-            # Binarize age: 1 if age >= 30, 0 otherwise
-            sensitive_data = (sensitive_data >= 30).astype(int)
+            # Binarize age: 0 if age < 30, 1 otherwise
+            sensitive_data = (sensitive_data < 30).astype(int)
 
         self.df[self.sensitive_attribute] = sensitive_data
         self.target = torch.tensor(self.df[self.target_attribute].values)

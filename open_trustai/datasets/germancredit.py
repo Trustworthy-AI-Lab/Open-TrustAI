@@ -228,14 +228,14 @@ class GermanCreditDataset(TabularDataset):
         # Extract and encode sensitive attribute
         sensitive_data = self.df[self.sensitive_attribute].copy()
         if self.sensitive_attribute == "age":
-            # Binarize age: 1 if age >= 25, 0 otherwise
-            sensitive_data = (sensitive_data >= 25).astype(int)
+            # Binarize age: 0 if age < 25, 1 otherwise
+            sensitive_data = (sensitive_data < 25).astype(int)
         elif self.sensitive_attribute == "personal_status_sex":
-            # Binarize personal_status_sex: 1 if Female, 0 if Male
-            sensitive_data = (sensitive_data == "Female").astype(int)
-        elif self.sensitive_attribute == "marital":
-            # Binarize marital status: 1 if married, 0 otherwise
-            sensitive_data = (sensitive_data == "married").astype(int)
+            # Binarize personal_status_sex: 0 if Female, 1 if Male
+            sensitive_data = (sensitive_data != "Female").astype(int)
+        elif self.sensitive_attribute == "foreign_worker":
+            # Binarize foreign_worker: 0 if Yes, 1 if No
+            sensitive_data = (sensitive_data != "Yes").astype(int)
         elif self.sensitive_attribute == "education":
             # Binarize education: 1 if has higher education, 0 otherwise
             sensitive_data = (sensitive_data.isin(["high", "university"])).astype(int)

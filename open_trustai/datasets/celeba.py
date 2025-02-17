@@ -288,6 +288,19 @@ class CelebADataset(VisionDataset):
         self.target = torch.tensor(
             self.df[self.target_attribute].values, dtype=torch.float32
         )
+        # Binarize sensitive attributes based on selection
+        sensitive_data = self.df[self.sensitive_attribute].copy()
+        if self.sensitive_attribute == "Male":
+            # Already binary (0=Female, 1=Male)
+            sensitive_data = sensitive_data
+        elif self.sensitive_attribute == "Young":
+            # Binarize age: 1 if Young, 0 if Not Young
+            sensitive_data = (sensitive_data == 1).astype(int)
+        elif self.sensitive_attribute == "Attractive":
+            # Already binary (0=not attractive, 1=attractive)
+            sensitive_data = sensitive_data
+
+        self.df[self.sensitive_attribute] = sensitive_data
         self.sensitive = torch.tensor(
             self.df[self.sensitive_attribute].values, dtype=torch.float32
         )

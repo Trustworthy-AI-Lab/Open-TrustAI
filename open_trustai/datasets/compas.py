@@ -245,11 +245,11 @@ class CompasDataset(TabularDataset):
             # Binarize race: 1 if Caucasian, 0 otherwise
             sensitive_data = (sensitive_data == "Caucasian").astype(int)
         elif self.sensitive_attribute == "sex":
-            # Binarize sex: 1 if Female, 0 if Male
-            sensitive_data = (sensitive_data == "Female").astype(int)
+            # Binarize sex: 0 if Female, 1 if Male
+            sensitive_data = (sensitive_data != "Female").astype(int)
         elif self.sensitive_attribute == "age_cat":
-            # Binarize age: 1 if Greater than 45, 0 otherwise
-            sensitive_data = (sensitive_data == "Greater than 45").astype(int)
+            # Binarize age: 0 if Greater than 45, 1 otherwise
+            sensitive_data = (sensitive_data != "Greater than 45").astype(int)
 
         # Extract sensitive attribute and reshape to column vector
         self.sensitive = torch.tensor(
